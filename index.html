@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Brainrot Pets VR | Restoration Project</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="background-effects"></div>
+        <div class="ui-panel">
+            <h1 class="game-title">BRAINROT PETS</h1>
+            <p id="status-text">BYPASSING JUNGLE HUB...</p>
+            
+            <div class="pet-display"></div>
+
+            <div id="menu-actions" style="display:none;">
+                <button id="start-btn">CONNECT TO PRIVATE SERVER</button>
+            </div>
+        </div>
+    </div>
+
+    <a-scene gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/;">
+        <a-assets>
+            </a-assets>
+
+        <a-sky color="#000510"></a-sky>
+        <a-grid material="color: #00ffcc; opacity: 0.2; transparent: true"></a-grid>
+
+        <a-entity id="rig" position="0 0 0">
+            <a-camera position="0 1.6 0"></a-camera>
+            <a-entity oculus-touch-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
+            <a-entity oculus-touch-controls="hand: right" pickaxe-tool></a-entity>
+        </a-entity>
+
+        <a-octahedron class="clickable" position="0 1.2 -3" color="#ff00ff" scale="0.5 1 0.5" 
+                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-octahedron>
+    </a-scene>
+
+    <script src="game.js"></script>
+</body>
+</html>
