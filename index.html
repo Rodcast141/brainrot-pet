@@ -11,8 +11,20 @@
         <div class="ui-panel">
             <h1 class="game-title">BRAINROT PETS</h1>
             <p id="status-text">BYPASSING JUNGLE HUB...</p>
-            
-            <div class="pet-display"></div>
+
+            <div class="pet-display" role="img" aria-label="Dev-only dog pet card">
+                <div class="dev-tag">DEV ONLY</div>
+                <div class="dog-emoji">🐶</div>
+                <p class="pet-name">Bedside Guardian Dog</p>
+                <p class="pet-bonus">+100% crystal sniff speed</p>
+            </div>
+
+            <div class="dev-character-card">
+                <h2>Character: Rebirth Overseer</h2>
+                <p>Unlock a hidden dev-only character and the dog pet together.</p>
+                <p class="rebirth-gate">Requirement: <strong>100 Rebirths</strong></p>
+                <p id="dev-unlock-status">Checking rebirth rank...</p>
+            </div>
 
             <div id="menu-actions" style="display:none;">
                 <button id="start-btn">CONNECT TO PRIVATE SERVER</button>
@@ -22,7 +34,7 @@
 
     <a-scene gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/;">
         <a-assets>
-            </a-assets>
+        </a-assets>
 
         <a-sky color="#000510"></a-sky>
         <a-grid material="color: #00ffcc; opacity: 0.2; transparent: true"></a-grid>
@@ -33,7 +45,7 @@
             <a-entity oculus-touch-controls="hand: right" pickaxe-tool></a-entity>
         </a-entity>
 
-        <a-octahedron class="clickable" position="0 1.2 -3" color="#ff00ff" scale="0.5 1 0.5" 
+        <a-octahedron class="clickable" position="0 1.2 -3" color="#ff00ff" scale="0.5 1 0.5"
                       animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-octahedron>
     </a-scene>
 
