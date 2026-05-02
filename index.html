@@ -1,52 +1,52 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Brainrot Pets: OG Bundle Edition</title>
+    <title>Brainrot Pets: VR Game DVD Edition</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <style>
-      body { margin: 0; overflow: hidden; }
-    </style>
+    <style>body { margin: 0; overflow: hidden; }</style>
   </head>
   <body>
     <a-scene>
       <a-assets>
-        <!-- Paste your base64 dog model data here -->
         <a-asset-item id="dog-model" src="data:application/octet-stream;base64,PASTE_YOUR_BINARY_DATA_HERE"></a-asset-item>
       </a-assets>
 
-      <!-- 1. THE PLAYER (DOG AVATAR) -->
+      <!-- 1. PLAYER RIG -->
       <a-entity id="rig" position="0 0 0">
         <a-camera id="camera" wasd-controls look-controls>
           <a-cursor fuse="false" raycaster="objects: .clickable" color="white"></a-cursor>
-          
-          <!-- PLAYTIME HUD: Displays your stats in the corner of your view -->
           <a-text id="stats-hud" value="Gems: 0 | Hours: 0.0" position="-1.5 1 -2" scale="0.5 0.5 0.5" color="yellow"></a-text>
         </a-camera>
-        <a-entity oculus-touch-controls="hand: left"></a-entity>
-        <a-entity oculus-touch-controls="hand: right"></a-entity>
-        
-        <a-entity id="player-dog" gltf-model="#dog-model" position="0 0 -1" scale="1 1 1" data-is-buff="false"></a-entity>
+        <a-entity id="right-hand" oculus-touch-controls="hand: right"></a-entity>
+        <a-entity id="player-dog" gltf-model="#dog-model" position="0 0 -1" scale="1 1 1"></a-entity>
       </a-entity>
 
-      <!-- 2. THE BED -->
-      <a-box id="dog-bed" position="0 0.1 -5" color="#ff4444" width="2" depth="2" height="0.2">
-        <a-text value="SLEEP FOR ABS" position="0 0.5 0" align="center" color="white" width="4"></a-text>
-      </a-box>
+      <!-- 2. COMPUTER STATION -->
+      <a-entity id="pc-setup" position="0 1 -3">
+        <a-box id="monitor" color="#111" width="1.2" height="0.8" depth="0.1" position="0 0.5 0">
+           <a-text id="game-screen" value="INSERT GAME DISC" align="center" width="2.5" color="#0f0" position="0 0 0.06"></a-text>
+        </a-box>
+        
+        <!-- PC Tower with Disc Tray -->
+        <a-box color="#333" width="0.4" height="0.6" depth="0.6" position="0.9 0 0">
+          <a-box id="disc-tray" color="#555" width="0.3" height="0.02" depth="0.4" position="0 0.1 0.35"></a-box>
+        </a-box>
 
-      <!-- 3. SHOP AREA -->
-      <a-entity id="shop" position="5 0 -8">
-        <a-entity id="pedestal" position="-2 0 0">
-          <a-cylinder color="#333" height="1" radius="0.8" position="0 0.5 0"></a-cylinder>
-          <a-entity gltf-model="#dog-model" position="0 1.2 0" scale="2.5 1.8 2.2" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"></a-entity>
-          <a-text value="OG BUNDLE (1000-PACK)" position="0 3.2 0" align="center" color="gold" width="6"></a-text>
+        <!-- DVD CASES ON THE DESK -->
+        <!-- Gorilla Tag Style DVD -->
+        <a-entity id="case-gtag" position="-0.8 -0.3 0.3">
+          <a-box class="clickable" id="gtag-box" color="blue" width="0.3" height="0.4" depth="0.05">
+            <a-text value="G-TAG" scale="0.2 0.2 0.2" position="0 0 0.03" align="center"></a-text>
+          </a-box>
+          <a-cylinder id="dvd-gtag" class="clickable" color="silver" height="0.01" radius="0.1" rotation="90 0 0" position="0 0 0.06" visible="false"></a-cylinder>
         </a-entity>
 
-        <a-entity id="buy-station" position="1 0 0">
-          <a-box color="#444" width="1.5" height="1" depth="0.8" position="0 0.5 0"></a-box>
-          <a-entity id="buy-button" class="clickable" position="0 1.2 0.45">
-            <a-plane color="#FFD700" width="1.8" height="0.6"></a-plane>
-            <a-text id="price-text" value="10,000 GEMS" color="black" align="center" width="4" position="0 0 0.02"></a-text>
-          </a-entity>
+        <!-- Spider-Man Style DVD -->
+        <a-entity id="case-spidey" position="-0.4 -0.3 0.3">
+          <a-box class="clickable" id="spidey-box" color="red" width="0.3" height="0.4" depth="0.05">
+            <a-text value="WEB-SWING" scale="0.2 0.2 0.2" position="0 0 0.03" align="center"></a-text>
+          </a-box>
+          <a-cylinder id="dvd-spidey" class="clickable" color="silver" height="0.01" radius="0.1" rotation="90 0 0" position="0 0 0.06" visible="false"></a-cylinder>
         </a-entity>
       </a-entity>
 
@@ -55,69 +55,58 @@
     </a-scene>
 
     <script>
-      // --- DATA LOADING ---
-      let playerGems = parseInt(localStorage.getItem('gems')) || 1000;
-      let totalPlaySeconds = parseFloat(localStorage.getItem('totalSeconds')) || 0;
-      let lastLogin = localStorage.getItem('lastLogin');
-      let today = new Date().toDateString();
+      let currentLoadedGame = "";
 
-      const dog = document.querySelector('#player-dog');
-      const hud = document.querySelector('#stats-hud');
+      // Logic for BOTH cases
+      const cases = [
+        {box: '#gtag-box', dvd: '#dvd-gtag', name: 'GORILLA TAG VR'},
+        {box: '#spidey-box', dvd: '#dvd-spidey', name: 'SPIDER-MAN VR'}
+      ];
 
-      // --- 1. DAILY QUEST REFRESH ---
-      function handleDailyLogin() {
-        if (lastLogin !== today) {
-          playerGems += 1000; // Daily reward
-          localStorage.setItem('lastLogin', today);
-          alert("Daily Quest Refreshed! +1,000 Gems for logging in.");
-          saveData();
-        }
-      }
+      cases.forEach(item => {
+        const boxEl = document.querySelector(item.box);
+        const dvdEl = document.querySelector(item.dvd);
 
-      // --- 2. PLAYTIME TRACKER ---
-      function trackTime() {
-        totalPlaySeconds += 1; // Tracks every second
-        let hoursPlayed = (totalPlaySeconds / 3600).toFixed(2);
-        hud.setAttribute('value', `Gems: ${playerGems} | Hours: ${hoursPlayed}`);
-        
-        // Save every 30 seconds to be safe
-        if (totalPlaySeconds % 30 === 0) { saveData(); }
-      }
+        // 1. Click Case to "Open" and show DVD
+        boxEl.addEventListener('click', () => {
+          boxEl.setAttribute('color', '#666'); // Change color to show it's open
+          dvdEl.setAttribute('visible', 'true');
+          console.log("Opened " + item.name + " case");
+        });
 
-      // --- 3. BED / BUFF LOGIC ---
-      function checkBed() {
-        const bed = document.querySelector('#dog-bed');
-        const dist = dog.object3D.position.distanceTo(bed.object3D.position);
-        if (dist < 1.8 && dog.getAttribute('data-is-buff') === "false") {
-          dog.setAttribute('data-is-buff', "true");
-          dog.setAttribute('animation__flex', { property: 'scale', to: '1.5 1.2 1.5', dur: 500 });
+        // 2. Click DVD to "Insert" into PC
+        dvdEl.addEventListener('click', () => {
+          // Move disc to the tray
+          dvdEl.setAttribute('animation', {
+            property: 'position',
+            to: {x: 0.9, y: 0.4, z: 0.3},
+            dur: 800
+          });
+          
           setTimeout(() => {
-            dog.setAttribute('animation__flex', { property: 'scale', to: '1 1 1', dur: 1000 });
-            setTimeout(() => dog.setAttribute('data-is-buff', "false"), 2000);
-          }, 5000);
-        }
-      }
-
-      // --- 4. PURCHASE LOGIC ---
-      document.querySelector('#buy-button').addEventListener('click', () => {
-        if (playerGems >= 10000) {
-          playerGems -= 10000;
-          dog.setAttribute('animation__og', { property: 'scale', to: '2.5 1.8 2.2', dur: 1000, easing: 'easeOutElastic' });
-          dog.setAttribute('material', 'emissive: #FFD700; emissiveIntensity: 0.6');
-          document.querySelector('#price-text').setAttribute('value', 'OG ACTIVE');
-          saveData();
-        }
+            dvdEl.setAttribute('visible', 'false');
+            loadGame(item.name);
+          }, 850);
+        });
       });
 
-      function saveData() {
-        localStorage.setItem('gems', playerGems);
-        localStorage.setItem('totalSeconds', totalPlaySeconds);
+      function loadGame(title) {
+        currentLoadedGame = title;
+        document.querySelector('#game-screen').setAttribute('value', "LOADING...\n" + title);
+        
+        // After 2 seconds, the game "runs"
+        setTimeout(() => {
+          document.querySelector('#game-screen').setAttribute('value', title + "\nNOW PLAYING");
+        }, 2000);
       }
 
-      // Start Loops
-      setInterval(trackTime, 1000);
-      setInterval(checkBed, 100);
-      handleDailyLogin();
+      // Re-use your Playtime and Gem stats here
+      let playerGems = parseInt(localStorage.getItem('gems')) || 1000;
+      let totalPlaySeconds = parseFloat(localStorage.getItem('totalSeconds')) || 0;
+      setInterval(() => {
+        totalPlaySeconds += 1;
+        document.querySelector('#stats-hud').setAttribute('value', `Gems: ${playerGems} | Hours: ${(totalPlaySeconds / 3600).toFixed(2)}`);
+      }, 1000);
     </script>
   </body>
 </html>
