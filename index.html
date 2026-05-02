@@ -1,42 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Brainrot Pets VR | Restoration Project</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <title>Brainrot Pets</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script>
+      AFRAME.registerComponent('avatar-system', {
+        init: function () {
+          this.owners = ["rusty.gamer32", "lars vr", "drelly"];
+          this.mods = ["mattsamp", "lucasinopunchunchini"];
+          this.applyAvatar("regular"); // Default avatar on spawn
+        },
+        applyAvatar: function(role, name) {
+          const model = document.querySelector('#player-model');
+          if (name === "lars vr") {
+            model.setAttribute('gltf-model', '#cat-memorial'); // Lars's cat
+          } else if (role === "owner" || role === "mod") {
+            model.setAttribute('gltf-model', '#staff-avatar'); // Special staff model
+          } else {
+            model.setAttribute('gltf-model', '#dog-random'); // Regular players spawn as a dog
+          }
+        }
+      });
+
+      AFRAME.registerComponent('tutorial', {
+        init: function() {
+          this.steps = ["Welcome! Swing arms to move.", "Mine crystals with pickaxes.", "Use the Cannon to travel!"];
+          this.current = 0;
+          this.updateText();
+        },
+        nextStep: function() {
+          this.current++;
+          if(this.current < this.steps.length) this.updateText();
+          else document.querySelector('#tutorial-board').setAttribute('visible', 'false');
+        },
+        updateText: function() {
+          document.querySelector('#tut-text').setAttribute('value', this.steps[this.current]);
+        }
+      });
+    </script>
 </head>
 <body>
-    <div id="loading-screen">
-        <div class="background-effects"></div>
-        <div class="ui-panel">
-            <h1 class="game-title">BRAINROT PETS</h1>
-            <p id="status-text">BYPASSING JUNGLE HUB...</p>
-            
-            <div class="pet-display"></div>
-
-            <div id="menu-actions" style="display:none;">
-                <button id="start-btn">CONNECT TO PRIVATE SERVER</button>
-            </div>
-        </div>
-    </div>
-
-    <a-scene gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/v1/decoders/;">
+    <a-scene avatar-system>
         <a-assets>
-            </a-assets>
+            <a-asset-item id="cat-memorial" src="lars_cat.glb"></a-asset-item>
+            <a-asset-item id="staff-avatar" src="staff_model.glb"></a-asset-item>
+            <a-asset-item id="dog-random" src="dog_regular.glb"></a-asset-item>
+            <a-asset-item id="bundle-og-pet" src="og_pet.glb"></a-asset-item>
+        </a-assets>
 
-        <a-sky color="#000510"></a-sky>
-        <a-grid material="color: #00ffcc; opacity: 0.2; transparent: true"></a-grid>
-
+        <!-- Player Rig with Avatar -->
         <a-entity id="rig" position="0 0 0">
             <a-camera position="0 1.6 0"></a-camera>
-            <a-entity oculus-touch-controls="hand: left" raycaster="objects: .clickable; far: 20"></a-entity>
-            <a-entity oculus-touch-controls="hand: right" pickaxe-tool></a-entity>
+            <a-entity id="player-model" position="0 -1.6 0" rotation="0 180 0"></a-entity>
+            <a-entity id="right-hand" oculus-touch-controls="hand: right" raycaster="objects: .interact" cursor></a-entity>
         </a-entity>
 
-        <a-octahedron class="clickable" position="0 1.2 -3" color="#ff00ff" scale="0.5 1 0.5" 
-                      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-octahedron>
-    </a-scene>
+        <!-- 1. THE TUTORIAL BOARD (Spawns in front of you) -->
+        <a-plane id="tutorial-board" tutorial position="0 2 -3" width="3" height="1.5" color="#222">
+            <a-text id="tut-text" value="" align="center" position="0 0.2 0.1"></a-text>
+            <a-box class="interact" position="0 -0.4 0.1" width="0.8" height="0.3" color="green" 
+                   onclick="this.parentElement.components.tutorial.nextStep()">
+                <a-text value="NEXT" align="center" scale="0.3"></a-text>
+            </a-box>
+        </a-plane>
 
-    <script src="game.js"></script>
+        <!-- 2. THE OG BUNDLE BOX -->
+        <a-box position="5 2 -10" width="4" height="4" depth="4" color="gold">
+            <a-text value="OG BUNDLE\n6-7 COSMETICS\nCOST: GEMS" align="center" position="0 1 2.1" scale="0.5"></a-text>
+            <a-entity gltf-model="#bundle-og-pet" position="0 -1 2.2" scale="0.5 0.5 0.5"></a-entity>
+        </a-box>
+
+        <!-- 3. THE HUB & CANNON -->
+        <a-cylinder position="0 -0.5 0" radius="20" color="#2e7d32"></a-cylinder>
+        <a-cylinder class="interact" position="10 0.5 0" radius="1" height="3" color="red" rotation="0 0 45">
+            <a-text value="CANNON TO BOSS" align="center" position="0 2 0" rotation="0 0 -45"></a-text>
+        </a-cylinder>
+
+        <a-sky color="#87CEEB"></a-sky>
+    </a-scene>
 </body>
 </html>
