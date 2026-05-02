@@ -1,82 +1,123 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Brainrot Pets</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script>
-      AFRAME.registerComponent('avatar-system', {
-        init: function () {
-          this.owners = ["rusty.gamer32", "lars vr", "drelly"];
-          this.mods = ["mattsamp", "lucasinopunchunchini"];
-          this.applyAvatar("regular"); // Default avatar on spawn
-        },
-        applyAvatar: function(role, name) {
-          const model = document.querySelector('#player-model');
-          if (name === "lars vr") {
-            model.setAttribute('gltf-model', '#cat-memorial'); // Lars's cat
-          } else if (role === "owner" || role === "mod") {
-            model.setAttribute('gltf-model', '#staff-avatar'); // Special staff model
-          } else {
-            model.setAttribute('gltf-model', '#dog-random'); // Regular players spawn as a dog
-          }
-        }
-      });
+  <head>
+    <title>Brainrot Pets: OG Bundle Edition</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <!-- Paste your base64 dog model data here -->
+        <a-asset-item id="dog-model" src="data:application/octet-stream;base64,PASTE_YOUR_BINARY_DATA_HERE"></a-asset-item>
+      </a-assets>
 
-      AFRAME.registerComponent('tutorial', {
-        init: function() {
-          this.steps = ["Welcome! Swing arms to move.", "Mine crystals with pickaxes.", "Use the Cannon to travel!"];
-          this.current = 0;
-          this.updateText();
-        },
-        nextStep: function() {
-          this.current++;
-          if(this.current < this.steps.length) this.updateText();
-          else document.querySelector('#tutorial-board').setAttribute('visible', 'false');
-        },
-        updateText: function() {
-          document.querySelector('#tut-text').setAttribute('value', this.steps[this.current]);
-        }
-      });
-    </script>
-</head>
-<body>
-    <a-scene avatar-system>
-        <a-assets>
-            <a-asset-item id="cat-memorial" src="lars_cat.glb"></a-asset-item>
-            <a-asset-item id="staff-avatar" src="staff_model.glb"></a-asset-item>
-            <a-asset-item id="dog-random" src="dog_regular.glb"></a-asset-item>
-            <a-asset-item id="bundle-og-pet" src="og_pet.glb"></a-asset-item>
-        </a-assets>
+      <!-- 1. THE PLAYER (DOG AVATAR) -->
+      <a-entity id="rig" position="0 0 0">
+        <a-camera id="camera" wasd-controls look-controls>
+          <a-cursor fuse="false" raycaster="objects: .clickable" color="white"></a-cursor>
+          
+          <!-- PLAYTIME HUD: Displays your stats in the corner of your view -->
+          <a-text id="stats-hud" value="Gems: 0 | Hours: 0.0" position="-1.5 1 -2" scale="0.5 0.5 0.5" color="yellow"></a-text>
+        </a-camera>
+        <a-entity oculus-touch-controls="hand: left"></a-entity>
+        <a-entity oculus-touch-controls="hand: right"></a-entity>
+        
+        <a-entity id="player-dog" gltf-model="#dog-model" position="0 0 -1" scale="1 1 1" data-is-buff="false"></a-entity>
+      </a-entity>
 
-        <!-- Player Rig with Avatar -->
-        <a-entity id="rig" position="0 0 0">
-            <a-camera position="0 1.6 0"></a-camera>
-            <a-entity id="player-model" position="0 -1.6 0" rotation="0 180 0"></a-entity>
-            <a-entity id="right-hand" oculus-touch-controls="hand: right" raycaster="objects: .interact" cursor></a-entity>
+      <!-- 2. THE BED -->
+      <a-box id="dog-bed" position="0 0.1 -5" color="#ff4444" width="2" depth="2" height="0.2">
+        <a-text value="SLEEP FOR ABS" position="0 0.5 0" align="center" color="white" width="4"></a-text>
+      </a-box>
+
+      <!-- 3. SHOP AREA -->
+      <a-entity id="shop" position="5 0 -8">
+        <a-entity id="pedestal" position="-2 0 0">
+          <a-cylinder color="#333" height="1" radius="0.8" position="0 0.5 0"></a-cylinder>
+          <a-entity gltf-model="#dog-model" position="0 1.2 0" scale="2.5 1.8 2.2" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"></a-entity>
+          <a-text value="OG BUNDLE (1000-PACK)" position="0 3.2 0" align="center" color="gold" width="6"></a-text>
         </a-entity>
 
-        <!-- 1. THE TUTORIAL BOARD (Spawns in front of you) -->
-        <a-plane id="tutorial-board" tutorial position="0 2 -3" width="3" height="1.5" color="#222">
-            <a-text id="tut-text" value="" align="center" position="0 0.2 0.1"></a-text>
-            <a-box class="interact" position="0 -0.4 0.1" width="0.8" height="0.3" color="green" 
-                   onclick="this.parentElement.components.tutorial.nextStep()">
-                <a-text value="NEXT" align="center" scale="0.3"></a-text>
-            </a-box>
-        </a-plane>
+        <a-entity id="buy-station" position="1 0 0">
+          <a-box color="#444" width="1.5" height="1" depth="0.8" position="0 0.5 0"></a-box>
+          <a-entity id="buy-button" class="clickable" position="0 1.2 0.45">
+            <a-plane color="#FFD700" width="1.8" height="0.6"></a-plane>
+            <a-text id="price-text" value="10,000 GEMS" color="black" align="center" width="4" position="0 0 0.02"></a-text>
+          </a-entity>
+        </a-entity>
+      </a-entity>
 
-        <!-- 2. THE OG BUNDLE BOX -->
-        <a-box position="5 2 -10" width="4" height="4" depth="4" color="gold">
-            <a-text value="OG BUNDLE\n6-7 COSMETICS\nCOST: GEMS" align="center" position="0 1 2.1" scale="0.5"></a-text>
-            <a-entity gltf-model="#bundle-og-pet" position="0 -1 2.2" scale="0.5 0.5 0.5"></a-entity>
-        </a-box>
-
-        <!-- 3. THE HUB & CANNON -->
-        <a-cylinder position="0 -0.5 0" radius="20" color="#2e7d32"></a-cylinder>
-        <a-cylinder class="interact" position="10 0.5 0" radius="1" height="3" color="red" rotation="0 0 45">
-            <a-text value="CANNON TO BOSS" align="center" position="0 2 0" rotation="0 0 -45"></a-text>
-        </a-cylinder>
-
-        <a-sky color="#87CEEB"></a-sky>
+      <a-sky color="#80deea"></a-sky>
+      <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#4db6ac"></a-plane>
     </a-scene>
-</body>
+
+    <script>
+      // --- DATA LOADING ---
+      let playerGems = parseInt(localStorage.getItem('gems')) || 1000;
+      let totalPlaySeconds = parseFloat(localStorage.getItem('totalSeconds')) || 0;
+      let lastLogin = localStorage.getItem('lastLogin');
+      let today = new Date().toDateString();
+
+      const dog = document.querySelector('#player-dog');
+      const hud = document.querySelector('#stats-hud');
+
+      // --- 1. DAILY QUEST REFRESH ---
+      function handleDailyLogin() {
+        if (lastLogin !== today) {
+          playerGems += 1000; // Daily reward
+          localStorage.setItem('lastLogin', today);
+          alert("Daily Quest Refreshed! +1,000 Gems for logging in.");
+          saveData();
+        }
+      }
+
+      // --- 2. PLAYTIME TRACKER ---
+      function trackTime() {
+        totalPlaySeconds += 1; // Tracks every second
+        let hoursPlayed = (totalPlaySeconds / 3600).toFixed(2);
+        hud.setAttribute('value', `Gems: ${playerGems} | Hours: ${hoursPlayed}`);
+        
+        // Save every 30 seconds to be safe
+        if (totalPlaySeconds % 30 === 0) { saveData(); }
+      }
+
+      // --- 3. BED / BUFF LOGIC ---
+      function checkBed() {
+        const bed = document.querySelector('#dog-bed');
+        const dist = dog.object3D.position.distanceTo(bed.object3D.position);
+        if (dist < 1.8 && dog.getAttribute('data-is-buff') === "false") {
+          dog.setAttribute('data-is-buff', "true");
+          dog.setAttribute('animation__flex', { property: 'scale', to: '1.5 1.2 1.5', dur: 500 });
+          setTimeout(() => {
+            dog.setAttribute('animation__flex', { property: 'scale', to: '1 1 1', dur: 1000 });
+            setTimeout(() => dog.setAttribute('data-is-buff', "false"), 2000);
+          }, 5000);
+        }
+      }
+
+      // --- 4. PURCHASE LOGIC ---
+      document.querySelector('#buy-button').addEventListener('click', () => {
+        if (playerGems >= 10000) {
+          playerGems -= 10000;
+          dog.setAttribute('animation__og', { property: 'scale', to: '2.5 1.8 2.2', dur: 1000, easing: 'easeOutElastic' });
+          dog.setAttribute('material', 'emissive: #FFD700; emissiveIntensity: 0.6');
+          document.querySelector('#price-text').setAttribute('value', 'OG ACTIVE');
+          saveData();
+        }
+      });
+
+      function saveData() {
+        localStorage.setItem('gems', playerGems);
+        localStorage.setItem('totalSeconds', totalPlaySeconds);
+      }
+
+      // Start Loops
+      setInterval(trackTime, 1000);
+      setInterval(checkBed, 100);
+      handleDailyLogin();
+    </script>
+  </body>
 </html>
