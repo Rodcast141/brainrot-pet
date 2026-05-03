@@ -103,4 +103,10 @@ export default function QuestBoard({ onClose }) {
                   </div>
                 </div>
               </div>
- 
+            );
+          })}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
