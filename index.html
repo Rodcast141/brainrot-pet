@@ -1,112 +1,14 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <title>Brainrot Pets: VR Game DVD Edition</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <style>body { margin: 0; overflow: hidden; }</style>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Base44 APP</title>
   </head>
   <body>
-    <a-scene>
-      <a-assets>
-        <a-asset-item id="dog-model" src="data:application/octet-stream;base64,PASTE_YOUR_BINARY_DATA_HERE"></a-asset-item>
-      </a-assets>
-
-      <!-- 1. PLAYER RIG -->
-      <a-entity id="rig" position="0 0 0">
-        <a-camera id="camera" wasd-controls look-controls>
-          <a-cursor fuse="false" raycaster="objects: .clickable" color="white"></a-cursor>
-          <a-text id="stats-hud" value="Gems: 0 | Hours: 0.0" position="-1.5 1 -2" scale="0.5 0.5 0.5" color="yellow"></a-text>
-        </a-camera>
-        <a-entity id="right-hand" oculus-touch-controls="hand: right"></a-entity>
-        <a-entity id="player-dog" gltf-model="#dog-model" position="0 0 -1" scale="1 1 1"></a-entity>
-      </a-entity>
-
-      <!-- 2. COMPUTER STATION -->
-      <a-entity id="pc-setup" position="0 1 -3">
-        <a-box id="monitor" color="#111" width="1.2" height="0.8" depth="0.1" position="0 0.5 0">
-           <a-text id="game-screen" value="INSERT GAME DISC" align="center" width="2.5" color="#0f0" position="0 0 0.06"></a-text>
-        </a-box>
-        
-        <!-- PC Tower with Disc Tray -->
-        <a-box color="#333" width="0.4" height="0.6" depth="0.6" position="0.9 0 0">
-          <a-box id="disc-tray" color="#555" width="0.3" height="0.02" depth="0.4" position="0 0.1 0.35"></a-box>
-        </a-box>
-
-        <!-- DVD CASES ON THE DESK -->
-        <!-- Gorilla Tag Style DVD -->
-        <a-entity id="case-gtag" position="-0.8 -0.3 0.3">
-          <a-box class="clickable" id="gtag-box" color="blue" width="0.3" height="0.4" depth="0.05">
-            <a-text value="G-TAG" scale="0.2 0.2 0.2" position="0 0 0.03" align="center"></a-text>
-          </a-box>
-          <a-cylinder id="dvd-gtag" class="clickable" color="silver" height="0.01" radius="0.1" rotation="90 0 0" position="0 0 0.06" visible="false"></a-cylinder>
-        </a-entity>
-
-        <!-- Spider-Man Style DVD -->
-        <a-entity id="case-spidey" position="-0.4 -0.3 0.3">
-          <a-box class="clickable" id="spidey-box" color="red" width="0.3" height="0.4" depth="0.05">
-            <a-text value="WEB-SWING" scale="0.2 0.2 0.2" position="0 0 0.03" align="center"></a-text>
-          </a-box>
-          <a-cylinder id="dvd-spidey" class="clickable" color="silver" height="0.01" radius="0.1" rotation="90 0 0" position="0 0 0.06" visible="false"></a-cylinder>
-        </a-entity>
-      </a-entity>
-
-      <a-sky color="#80deea"></a-sky>
-      <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#4db6ac"></a-plane>
-    </a-scene>
-
-    <script>
-      let currentLoadedGame = "";
-
-      // Logic for BOTH cases
-      const cases = [
-        {box: '#gtag-box', dvd: '#dvd-gtag', name: 'GORILLA TAG VR'},
-        {box: '#spidey-box', dvd: '#dvd-spidey', name: 'SPIDER-MAN VR'}
-      ];
-
-      cases.forEach(item => {
-        const boxEl = document.querySelector(item.box);
-        const dvdEl = document.querySelector(item.dvd);
-
-        // 1. Click Case to "Open" and show DVD
-        boxEl.addEventListener('click', () => {
-          boxEl.setAttribute('color', '#666'); // Change color to show it's open
-          dvdEl.setAttribute('visible', 'true');
-          console.log("Opened " + item.name + " case");
-        });
-
-        // 2. Click DVD to "Insert" into PC
-        dvdEl.addEventListener('click', () => {
-          // Move disc to the tray
-          dvdEl.setAttribute('animation', {
-            property: 'position',
-            to: {x: 0.9, y: 0.4, z: 0.3},
-            dur: 800
-          });
-          
-          setTimeout(() => {
-            dvdEl.setAttribute('visible', 'false');
-            loadGame(item.name);
-          }, 850);
-        });
-      });
-
-      function loadGame(title) {
-        currentLoadedGame = title;
-        document.querySelector('#game-screen').setAttribute('value', "LOADING...\n" + title);
-        
-        // After 2 seconds, the game "runs"
-        setTimeout(() => {
-          document.querySelector('#game-screen').setAttribute('value', title + "\nNOW PLAYING");
-        }, 2000);
-      }
-
-      // Re-use your Playtime and Gem stats here
-      let playerGems = parseInt(localStorage.getItem('gems')) || 1000;
-      let totalPlaySeconds = parseFloat(localStorage.getItem('totalSeconds')) || 0;
-      setInterval(() => {
-        totalPlaySeconds += 1;
-        document.querySelector('#stats-hud').setAttribute('value', `Gems: ${playerGems} | Hours: ${(totalPlaySeconds / 3600).toFixed(2)}`);
-      }, 1000);
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
